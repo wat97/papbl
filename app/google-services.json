@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1031207285490-dlajev9ksutgdv8kplfl2l884mh174ht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "filkom.ub.getmeallocation",
+            "certificate_hash": "95c51490b40aa7dacad1dbd65211df6a90a125fd"
+          }
+        },
+        {
           "client_id": "1031207285490-9s9aclc7cbgfk24ehbsklpk68lcgs02k.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1031207285490-9s9aclc7cbgfk24ehbsklpk68lcgs02k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
