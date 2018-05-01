@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1031207285490-jggvbov1l9dfk55obs67co09j59t0ueq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "filkom.ub.getmeallocation",
+            "certificate_hash": "c68df66ef643dfe83b0a2f2a7d2c2efa9bb224b5"
+          }
+        },
+        {
           "client_id": "1031207285490-dlajev9ksutgdv8kplfl2l884mh174ht.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

@@ -17,7 +17,7 @@ public class HomeActivity extends AppCompatActivity {
 
     //view objects
     private TextView textViewUserEmail;
-    private Button buttonLogout;
+    private Button buttonLogout, buttonTambah;
 
 
     @Override
@@ -42,6 +42,7 @@ public class HomeActivity extends AppCompatActivity {
         //initializing views
         textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
         buttonLogout = (Button) findViewById(R.id.buttonLogout);
+        buttonTambah = (Button) findViewById(R.id.buttonTambah);
 
         //displaying logged in user name
         textViewUserEmail.setText("Welcome "+user.getDisplayName()+" "+user.getEmail());
@@ -56,6 +57,14 @@ public class HomeActivity extends AppCompatActivity {
                 finish();
                 //starting login activity
                 startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+            }
+        });
+
+
+        buttonTambah.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), TambahActivity.class));
             }
         });
     }

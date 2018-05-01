@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private String email,password;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
                 email = editTextEmail.getText().toString();
                 password = editTextPassword.getText().toString();
                 if(TextUtils.isEmpty(email)){
-
                     Toast.makeText(MainActivity.this,"Please enter email", Toast.LENGTH_LONG).show();
 
                 }
