@@ -76,7 +76,7 @@ public class DetailRestoranActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     MenuModel menuModel = snapshot.getValue(MenuModel.class);
-                    Toast.makeText(DetailRestoranActivity.this, i + " "menuModel.getNamaMenu(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DetailRestoranActivity.this, i + " " + menuModel.getNamaMenu(), Toast.LENGTH_SHORT).show();
                     i++;
                 }
             }
