@@ -32,7 +32,7 @@
         android:hint="Harga makanan"
         android:inputType="number" />
 
-     <EditText
+    <EditText
         android:id="@+id/et_lokasi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -48,6 +48,17 @@
         android:hint="date"
         android:ems="10"
         android:inputType="date" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btn_submit_iamge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tambahkan gambar" />
 
     <Button
         android:id="@+id/button_submit_menu"
