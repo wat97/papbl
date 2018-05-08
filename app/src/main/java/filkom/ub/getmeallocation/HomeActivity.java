@@ -5,10 +5,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import filkom.ub.getmeallocation.adapter.RestoranAdapter;
+import filkom.ub.getmeallocation.model.MenuModel;
 import filkom.ub.getmeallocation.model.RestoranModel;
 
 public class HomeActivity extends AppCompatActivity {
@@ -35,6 +38,7 @@ public class HomeActivity extends AppCompatActivity {
     private Button buttonLogout, buttonTambah;
 
     private DatabaseReference databaseRestoran;
+    private DatabaseReference databaseMenu;
 
     private RecyclerView recyclerView;
     private RestoranAdapter restoranAdapter;
@@ -96,6 +100,7 @@ public class HomeActivity extends AppCompatActivity {
         getAllRestoran();
     }
 
+    private ArrayList<String> restoranKey = new ArrayList<>();
     private void getAllRestoran() {
         databaseRestoran.addValueEventListener(new ValueEventListener() {
             @Override
@@ -106,14 +111,35 @@ public class HomeActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     RestoranModel restoranModel = dataSnapshot1.getValue(RestoranModel.class);
                     restorans.add(restoranModel);
+                    restoranKey.add(dataSnapshot1.getKey());
                 }
                 restoranAdapter.addItem(restorans);
                     recyclerView.setAdapter(restoranAdapter);
+
+                    //getAllMenu();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+    }
+
+    private void getAllMenu() {
+        for (int i = 0; i < restoranKey.size(); i++) {
+            databaseRestoran.child(restoranKey.get(i)).child("menu").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        MenuModel menuModel = snapshot.getValue(MenuModel.class);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 }

@@ -132,12 +132,8 @@ public class TambahActivity extends AppCompatActivity {
                                 .getBitmap(cr, selectedImage);
 
                         imageView.setImageBitmap(bitmap);
-                        //Toast.makeText(this, selectedImage.toString(),Toast.LENGTH_LONG).show();
 
                     } catch (Exception e) {
-                        //Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
-                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT)
-                                .show();
                         Log.e("Camera", e.toString());
                     }
                 }
@@ -224,7 +220,6 @@ public class TambahActivity extends AppCompatActivity {
                         if (namaRestoranExist.equals(snapshot.child("namaRestoran").getValue(String.class))) {
                             String key = databaseRestoran.push().getKey();
                             snapshot.getRef().child("menu").child(key).setValue(menuModel);
-                            //Toast.makeText(TambahActivity.this, snapshot.child("namaRestoran").getValue(String.class), Toast.LENGTH_SHORT).show();
                             Toast.makeText(TambahActivity.this, "Berhasil menambahkan menu", Toast.LENGTH_SHORT).show();
 
                             uploadImage("menu", key);
@@ -261,13 +256,11 @@ public class TambahActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Uri downkloadUrl = taskSnapshot.getUploadSessionUri();
-                        //Toast.makeText(TambahActivity.this, downkloadUrl.toString(), Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(TambahActivity.this, "failed", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

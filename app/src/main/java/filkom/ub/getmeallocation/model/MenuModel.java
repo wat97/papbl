@@ -1,6 +1,8 @@
 package filkom.ub.getmeallocation.model;
 
-public class MenuModel {
+import java.io.Serializable;
+
+public class MenuModel implements Serializable{
 
     private String namaMenu;
     private String harga;

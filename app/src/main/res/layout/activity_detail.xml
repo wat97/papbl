@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".model.DetailRestoranActivity">
+
+    <TextView
+        android:id="@+id/tv_nama_restoran"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nama restoran" />
+
+    <TextView
+        android:id="@+id/tv_lokasi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Lokasi" />
+
+    <TextView
+        android:id="@+id/tv_nama_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nama menu" />
+
+    <TextView
+        android:id="@+id/tv_harga"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="harga" />
+
+    <TextView
+        android:id="@+id/tv_tanggal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="tanggal" />
+</LinearLayout>
