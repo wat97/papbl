@@ -1,5 +1,6 @@
 package filkom.ub.getmeallocation;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -118,7 +119,9 @@ public class TambahActivity extends AppCompatActivity {
                     for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
                         if (namaRestoranExist.equals(snapshot.child("namaRestoran").getValue(String.class))) {
                             snapshot.getRef().child("menu").child(databaseRestoran.push().getKey()).setValue(menuModel);
-                            Toast.makeText(TambahActivity.this, snapshot.child("namaRestoran").getValue(String.class), Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(TambahActivity.this, snapshot.child("namaRestoran").getValue(String.class), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(TambahActivity.this, "Berhasil menambahkan menu", Toast.LENGTH_SHORT).show();
+                            goToMain();
                         }
                     }
                 }
@@ -134,6 +137,8 @@ public class TambahActivity extends AppCompatActivity {
             String key = databaseRestoran.push().getKey();
             databaseRestoran.child(key).setValue(restoranModel);
             databaseRestoran.child(key).child("menu").child(databaseRestoran.push().getKey()).setValue(menuModel);
+            Toast.makeText(this, "Berhasil menambahkan warung", Toast.LENGTH_SHORT).show();
+            goToMain();
         }
 
     }
@@ -141,5 +146,9 @@ public class TambahActivity extends AppCompatActivity {
     private String setCurrentDate() {
         Date currentTime = Calendar.getInstance().getTime();
         return currentTime.toString();
+    }
+
+    private void goToMain() {
+        startActivity(new Intent(this, HomeActivity.class));
     }
 }
