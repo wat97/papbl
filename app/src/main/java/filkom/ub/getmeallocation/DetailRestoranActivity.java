@@ -1,8 +1,10 @@
-package filkom.ub.getmeallocation.model;
+package filkom.ub.getmeallocation;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,11 +14,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import filkom.ub.getmeallocation.R;
+import java.util.ArrayList;
+
+import filkom.ub.getmeallocation.adapter.MenuAdapter;
+import filkom.ub.getmeallocation.model.MenuModel;
+import filkom.ub.getmeallocation.model.RestoranModel;
 
 public class DetailRestoranActivity extends AppCompatActivity {
 
     private TextView tvNamaRestoran, tvNamaMenu, tvLokasi, tvHarga, tvTanggal;
+
+    private RecyclerView recyclerView;
+    private MenuAdapter menuAdapter;
 
     private DatabaseReference databaseReference;
     private RestoranModel restoran;
@@ -42,6 +51,9 @@ public class DetailRestoranActivity extends AppCompatActivity {
 //        tvNamaMenu.setText(restoran.getMenuModel().getNamaMenu());
 //        tvTanggal.setText(restoran.getMenuModel().getDate());
 //        tvHarga.setText(restoran.getMenuModel().getHarga());
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        menuAdapter = new MenuAdapter(this);
 
         getSpecificRestoran();
     }
@@ -74,11 +86,15 @@ public class DetailRestoranActivity extends AppCompatActivity {
             int i = 0;
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<MenuModel> menuModels = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     MenuModel menuModel = snapshot.getValue(MenuModel.class);
-                    Toast.makeText(DetailRestoranActivity.this, i + " " + menuModel.getNamaMenu(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(DetailRestoranActivity.this, i + " " + menuModel.getNamaMenu(), Toast.LENGTH_SHORT).show();
+                    menuModels.add(menuModel);
                     i++;
                 }
+                menuAdapter.addItem(menuModels);
+                recyclerView.setAdapter(menuAdapter);
             }
 
             @Override

@@ -15,7 +15,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import filkom.ub.getmeallocation.R;
-import filkom.ub.getmeallocation.model.DetailRestoranActivity;
+import filkom.ub.getmeallocation.DetailRestoranActivity;
 import filkom.ub.getmeallocation.model.RestoranModel;
 
 public class RestoranAdapter extends RecyclerView.Adapter<RestoranAdapter.ViewHolder> {
@@ -37,7 +37,7 @@ public class RestoranAdapter extends RecyclerView.Adapter<RestoranAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         layoutInflater = LayoutInflater.from(parent.getContext());
-        View v = layoutInflater.inflate(R.layout.row_view, parent, false);
+        View v = layoutInflater.inflate(R.layout.row_restoran, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }

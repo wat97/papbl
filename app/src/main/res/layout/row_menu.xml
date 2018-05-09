@@ -17,11 +17,20 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tv_nip"
+        android:id="@+id/tv_harga"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
-        android:text="nip"
+        android:text="Harga"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:text="Harga"
         android:textAppearance="?android:textAppearanceMedium"
         android:textStyle="bold" />
 

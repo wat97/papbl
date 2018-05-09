@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".model.DetailRestoranActivity">
+    tools:context=".DetailRestoranActivity">
 
     <TextView
         android:id="@+id/tv_nama_restoran"
@@ -36,4 +36,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="tanggal" />
+
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            tools:listitem="@layout/row_menu"
+            android:layout_height="wrap_content" />
 </LinearLayout>
