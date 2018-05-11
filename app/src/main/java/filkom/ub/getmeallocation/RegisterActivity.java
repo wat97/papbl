@@ -17,7 +17,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     private EditText editTextEmail;
     private EditText editTextPassword;
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         buttonSignup = (Button) findViewById(R.id.buttonSignup);
         textViewSignin = (TextView) findViewById(R.id.textViewSignin);
 
-        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog = new ProgressDialog(RegisterActivity.this);
 
         //initializing firebase auth object
         firebaseAuth = FirebaseAuth.getInstance();
@@ -62,11 +62,11 @@ public class MainActivity extends AppCompatActivity {
                 email = editTextEmail.getText().toString();
                 password = editTextPassword.getText().toString();
                 if(TextUtils.isEmpty(email)){
-                    Toast.makeText(MainActivity.this,"Please enter email", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this,"Please enter email", Toast.LENGTH_LONG).show();
 
                 }
                 else if(TextUtils.isEmpty(password)){
-                    Toast.makeText(MainActivity.this,"Please enter password",Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this,"Please enter password",Toast.LENGTH_LONG).show();
 
                 }
                 else if (password.length() < 6) {
@@ -110,16 +110,16 @@ public class MainActivity extends AppCompatActivity {
 
         //creating a new user
         firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         //checking if success
                         if(task.isSuccessful()){
                             //display some message here
-                            Toast.makeText(MainActivity.this,"Successfully registered",Toast.LENGTH_LONG).show();
+                            Toast.makeText(RegisterActivity.this,"Successfully registered",Toast.LENGTH_LONG).show();
                         }else{
                             //display some message here
-                            Toast.makeText(MainActivity.this,"Registration Error",Toast.LENGTH_LONG).show();
+                            Toast.makeText(RegisterActivity.this,"Registration Error",Toast.LENGTH_LONG).show();
                         }
                         progressDialog.dismiss();
                     }
