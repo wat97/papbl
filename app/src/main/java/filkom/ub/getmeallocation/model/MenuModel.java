@@ -7,14 +7,24 @@ public class MenuModel implements Serializable{
     private String namaMenu;
     private String harga;
     private String date;
+    private String imageUrl;
 
     public MenuModel() {
     }
 
-    public MenuModel(String namaMenu, String harga, String date) {
+    public MenuModel(String namaMenu, String harga, String date, String imageUrl) {
         this.namaMenu = namaMenu;
         this.harga = harga;
         this.date = date;
+        this.imageUrl = imageUrl;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getNamaMenu() {
