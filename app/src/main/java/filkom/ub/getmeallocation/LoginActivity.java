@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
         textViewSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
                 finish();
             }
         });

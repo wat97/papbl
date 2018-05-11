@@ -24,6 +24,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import filkom.ub.getmeallocation.adapter.MenuAdapter;
 import filkom.ub.getmeallocation.adapter.RestoranAdapter;
 import filkom.ub.getmeallocation.model.MenuModel;
 import filkom.ub.getmeallocation.model.RestoranModel;
@@ -42,7 +43,10 @@ public class HomeActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private RestoranAdapter restoranAdapter;
+    private MenuAdapter menuAdapter;
     private ArrayList<RestoranModel> restoranModels;
+
+    public static final String TAG = "getMeal";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +76,7 @@ public class HomeActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         restoranAdapter = new RestoranAdapter(this);
+        menuAdapter = new MenuAdapter(this);
 
         //displaying logged in user name
         textViewUserEmail.setText("Welcome "+user.getDisplayName()+" "+user.getEmail());
@@ -111,10 +116,13 @@ public class HomeActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     RestoranModel restoranModel = dataSnapshot1.getValue(RestoranModel.class);
                     restorans.add(restoranModel);
+                    //Log.d(TAG, "onDataChange: "+dataSnapshot1.getKey());
                     restoranKey.add(dataSnapshot1.getKey());
                 }
                 restoranAdapter.addItem(restorans);
-                    recyclerView.setAdapter(restoranAdapter);
+                getAllMenu();
+                //Log.d(TAG, "onDataChange: "+restoranKey.size());
+                    //recyclerView.setAdapter(restoranAdapter);
 
                     //getAllMenu();
             }
@@ -125,6 +133,8 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    private ArrayList<MenuModel> menus = new ArrayList<>();
+    private ArrayList<String> imageKey = new ArrayList<>();
     private void getAllMenu() {
         for (int i = 0; i < restoranKey.size(); i++) {
             databaseRestoran.child(restoranKey.get(i)).child("menu").addValueEventListener(new ValueEventListener() {
@@ -132,7 +142,13 @@ public class HomeActivity extends AppCompatActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         MenuModel menuModel = snapshot.getValue(MenuModel.class);
+                        menus.add(menuModel);
+                        Log.d(TAG, "onDataChange: "+snapshot.getKey());
+                        imageKey.add(snapshot.getKey());
                     }
+                    menuAdapter.addItem(menus, imageKey);
+                    recyclerView.setAdapter(menuAdapter);
+                    Log.d(TAG, "onDataChange: "+imageKey.get(0));
                 }
 
                 @Override

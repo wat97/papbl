@@ -1,14 +1,21 @@
 package filkom.ub.getmeallocation;
 
+import android.Manifest;
+import android.animation.AnimatorSet;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
@@ -22,6 +29,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -40,13 +48,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 import filkom.ub.getmeallocation.model.MenuModel;
 import filkom.ub.getmeallocation.model.RestoranModel;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class TambahActivity extends AppCompatActivity {
+public class TambahActivity extends AppCompatActivity implements GetAddressTask.OnTaskCompleted {
 
     private EditText etNamamenu, etHarga, etDate, etLokasi;
     private AutoCompleteTextView actvNamaRestoran;
@@ -63,10 +78,29 @@ public class TambahActivity extends AppCompatActivity {
     private ArrayAdapter<String> arrayAdapter;
 
     public static final String TAG = "tambahM";
+    public static String imageUrl = "null";
+    public static String imagePath = "null";
 
 
     private static final int TAKE_PICTURE = 1;
     private Uri imageUri;
+
+    // Constants
+    private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private static final String TRACKING_LOCATION_KEY = "tracking_location";
+
+    // Views
+    private Button mLocationButton;
+    private TextView mLocationTextView;
+    private ImageView mAndroidImageView;
+
+    // Location classes
+    private boolean mTrackingLocation;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback mLocationCallback;
+
+    // Animation
+    private AnimatorSet mRotateAnim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +135,25 @@ public class TambahActivity extends AppCompatActivity {
             }
         });
 
+        checkGpsEnabled(getApplicationContext());
+
+        // Initialize the location callbacks.
+        mLocationCallback = new LocationCallback() {
+            /**
+             * This is the callback that is triggered when the
+             * FusedLocationClient updates your location.
+             * @param locationResult The result containing the device location.
+             */
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                // If tracking is turned on, reverse geocode into an address
+                if (mTrackingLocation) {
+                    new GetAddressTask(TambahActivity.this, TambahActivity.this)
+                            .execute(locationResult.getLastLocation());
+                }
+            }
+        };
+
         etDate.setText(setCurrentDate());
         getAllRestoran();
     }
@@ -133,11 +186,60 @@ public class TambahActivity extends AppCompatActivity {
 
                         imageView.setImageBitmap(bitmap);
 
+                        imagePath = selectedImage.getPath();
+                        int cut = imagePath.lastIndexOf('/');
+                        if (cut != -1) {
+                            imagePath = imagePath.substring(cut + 1);
+                        }
+
                     } catch (Exception e) {
                         Log.e("Camera", e.toString());
                     }
                 }
         }
+    }
+
+    /**
+     * Starts tracking the device. Checks for
+     * permissions, and requests them if they aren't present. If they are,
+     * requests periodic location updates, sets a loading text and starts the
+     * animation.
+     */
+    private void startTrackingLocation() {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]
+                            {Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION_PERMISSION);
+        } else {
+            mTrackingLocation = true;
+            mFusedLocationClient.requestLocationUpdates
+                    (getLocationRequest(),
+                            mLocationCallback,
+                            null /* Looper */);
+
+            // Set a loading text while you wait for the address to be
+            // returned
+             mLocationTextView.setText(getString(R.string.address_text,
+                    getString(R.string.loading),
+                    System.currentTimeMillis()));
+            mLocationButton.setText(R.string.stop_tracking_location);
+            mRotateAnim.start();
+        }
+    }
+
+        /**
+     * Sets up the location request.
+     *
+     * @return The LocationRequest object containing the desired parameters.
+     */
+    private LocationRequest getLocationRequest() {
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return locationRequest;
     }
 
     public  boolean isStoragePermissionGranted() {
@@ -165,6 +267,48 @@ public class TambahActivity extends AppCompatActivity {
         if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
             Log.v(TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);
             //resume tasks needing this permission
+        }
+    }
+
+        /**
+     * Show dialog warning when GPS off
+     */
+    private void checkGpsEnabled(Context context) {
+        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (Exception ex) {
+        }
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception ex) {
+        }
+
+        if (!gps_enabled || !network_enabled) {
+            // notify user
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setMessage("gps network disable");
+            dialog.setPositiveButton(("open location setting"), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    // TODO Auto-generated method stub
+                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    //get gps
+                }
+            });
+            dialog.setNegativeButton(("cancel"), new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    // TODO Auto-generated method stub
+
+                }
+            });
+            dialog.show();
         }
     }
 
@@ -199,6 +343,44 @@ public class TambahActivity extends AppCompatActivity {
     String namaRestoranExist;
     private void insertMenu() {
 
+        uploadImage("menu", imagePath);
+    }
+
+    public static String random() {
+        Random generator = new Random();
+        StringBuilder randomStringBuilder = new StringBuilder();
+        int randomLength = generator.nextInt(3);
+        char tempChar;
+        for (int i = 0; i < randomLength; i++){
+            tempChar = (char) (generator.nextInt(96) + 32);
+            randomStringBuilder.append(tempChar);
+        }
+        return randomStringBuilder.toString();
+    }
+
+    private void uploadImage(String type, String key) {
+
+        //storageReference = FirebaseStorage.getInstance().getReference(type + "/" + key + ".jpg");
+        storageReference = FirebaseStorage.getInstance().getReference(random());
+
+        storageReference.putFile(imageUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Uri downkloadUrl = taskSnapshot.getDownloadUrl();
+                        imageUrl = downkloadUrl.toString();
+                        Log.d(TAG, "onSuccess: "+downkloadUrl);
+                        submitMenu(imageUrl);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    private void submitMenu(String imageUrl) {
         restoranExist = false;
         namaRestoranExist = "";
         for (int i = 0; i < namaRestoran.size(); i++) {
@@ -209,7 +391,7 @@ public class TambahActivity extends AppCompatActivity {
             }
         }
 
-        final MenuModel menuModel = new MenuModel(etNamamenu.getText().toString(), etHarga.getText().toString(), etDate.getText().toString());
+        final MenuModel menuModel = new MenuModel(etNamamenu.getText().toString(), etHarga.getText().toString(), etDate.getText().toString(), imageUrl);
         if (restoranExist) {
             //query get dataaseRestoran REFERENCE
             //update REFERENCE menu1
@@ -222,8 +404,6 @@ public class TambahActivity extends AppCompatActivity {
                             snapshot.getRef().child("menu").child(key).setValue(menuModel);
                             Toast.makeText(TambahActivity.this, "Berhasil menambahkan menu", Toast.LENGTH_SHORT).show();
 
-                            uploadImage("menu", key);
-
                             goToMain();
                         }
                     }
@@ -231,7 +411,7 @@ public class TambahActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
+                    Toast.makeText(TambahActivity.this, "failed", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -241,28 +421,8 @@ public class TambahActivity extends AppCompatActivity {
             databaseRestoran.child(key).setValue(restoranModel);
             databaseRestoran.child(key).child("menu").child(key).setValue(menuModel);
             Toast.makeText(this, "Berhasil menambahkan warung", Toast.LENGTH_SHORT).show();
-            uploadImage("menu", key);
             goToMain();
         }
-
-    }
-
-    private void uploadImage(String type, String key) {
-
-        storageReference = FirebaseStorage.getInstance().getReference(type + "/" + key + ".jpg");
-
-        storageReference.putFile(imageUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Uri downkloadUrl = taskSnapshot.getUploadSessionUri();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                    }
-                });
     }
 
     private String setCurrentDate() {
@@ -272,5 +432,20 @@ public class TambahActivity extends AppCompatActivity {
 
     private void goToMain() {
         startActivity(new Intent(this, HomeActivity.class));
+    }
+
+    @Override
+    public void onTaskCompleted(String result) {
+            if (mTrackingLocation) {
+            // Update the UI
+                Log.d(TAG, "onTaskCompleted: "+result);
+            mLocationTextView.setText(getString(R.string.address_text,
+                            result, System.currentTimeMillis()));
+        }
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 }
