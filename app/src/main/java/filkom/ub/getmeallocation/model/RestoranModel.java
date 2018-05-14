@@ -6,14 +6,16 @@ public class RestoranModel implements Serializable{
 
     private MenuModel menu;
     private String namaRestoran;
-    private String lokasi;
+    private String lat;
+    private String lng;
 
     public RestoranModel() {
     }
 
-    public RestoranModel(String namaRestoran, String lokasi) {
+    public RestoranModel(String namaRestoran, String lat, String lng) {
         this.namaRestoran = namaRestoran;
-        this.lokasi = lokasi;
+        this.lat = lat;
+        this.lng = lng;
         //this.menu = menuModel;
     }
 
@@ -33,11 +35,20 @@ public class RestoranModel implements Serializable{
         this.namaRestoran = namaRestoran;
     }
 
-    public String getLokasi() {
-        return lokasi;
+    public String getLat() {
+        return lat;
     }
 
-    public void setLokasi(String lokasi) {
-        this.lokasi = lokasi;
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+
+    public String getLng() {
+        return lng;
+    }
+
+    public void setLng(String lng) {
+        this.lng = lng;
     }
 }
+
