@@ -210,6 +210,7 @@ public class TambahActivity extends AppCompatActivity  {
 
                         imageView.setImageBitmap(bitmap);
 
+                        //remove path /, get filename only
                         imagePath = selectedImage.getPath();
                         int cut = imagePath.lastIndexOf('/');
                         if (cut != -1) {

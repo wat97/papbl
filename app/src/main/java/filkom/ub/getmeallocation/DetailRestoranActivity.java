@@ -233,7 +233,7 @@ public class DetailRestoranActivity extends AppCompatActivity implements OnMapRe
     }
 
     public void onLocationReady() {
-        LatLng loc = new LatLng(Double.parseDouble(restoran.getLng()), Double.parseDouble(restoran.getLng()));
+        LatLng loc = new LatLng(Double.parseDouble(restoran.getLat()), Double.parseDouble(restoran.getLng()));
 
         addLocationMarker(mGoogleMap, loc, "Current Location");
         mLocationMarker.position(loc);
