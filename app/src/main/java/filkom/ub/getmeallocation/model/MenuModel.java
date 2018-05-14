@@ -9,16 +9,18 @@ public class MenuModel implements Serializable{
     private String date;
     private String imageUrl;
     private String uidUser;
+    private String namaRestoran;
 
     public MenuModel() {
     }
 
-    public MenuModel(String uidUser, String namaMenu, String harga, String date, String imageUrl) {
+    public MenuModel(String uidUser, String namaMenu, String harga, String date, String imageUrl, String namaRestoran) {
         this.uidUser = uidUser;
         this.namaMenu = namaMenu;
         this.harga = harga;
         this.date = date;
         this.imageUrl = imageUrl;
+        this.namaRestoran = namaRestoran;
     }
 
     public String getUidUser() {
@@ -59,5 +61,13 @@ public class MenuModel implements Serializable{
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getNamaRestoran() {
+        return namaRestoran;
+    }
+
+    public void setNamaRestoran(String namaRestoran) {
+        this.namaRestoran = namaRestoran;
     }
 }
