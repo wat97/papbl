@@ -15,4 +15,5 @@
     <string name="gps_network_not_enabled">GPS network is disabled</string>
     <string name="open_location_settings">Open location settings to active GPS</string>
     <string name="cancel">Cancel</string>
+    <string name="google_maps_api_key">AIzaSyAqGlJOTvnAjCVXb_npHhYfzOuFe0Hsuso</string>
 </resources>

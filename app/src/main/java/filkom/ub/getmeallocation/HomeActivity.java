@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +37,8 @@ public class HomeActivity extends AppCompatActivity {
 
     //view objects
     private TextView textViewUserEmail;
-    private Button buttonLogout, buttonTambah;
+    private Button buttonLogout, buttonTambah, buttonCari;
+    private EditText carikan;
 
     private DatabaseReference databaseRestoran;
     private DatabaseReference databaseMenu;
@@ -70,8 +72,11 @@ public class HomeActivity extends AppCompatActivity {
 
         //initializing views
         textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
+        carikan = (EditText) findViewById(R.id.et_cari);
         buttonLogout = (Button) findViewById(R.id.buttonLogout);
         buttonTambah = (Button) findViewById(R.id.buttonTambah);
+        buttonCari = (Button) findViewById(R.id.btnCari);
+
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -103,6 +108,36 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         getAllRestoran();
+        buttonCari.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String textCari = carikan.getText().toString();
+                Toast.makeText(getApplicationContext(),textCari,Toast.LENGTH_SHORT).show();
+
+                CariDong(textCari);
+            }
+        });
+
+    }
+
+    protected void CariDong(String cariin){
+        int perbandingan = Integer.parseInt(cariin);
+        MenuModel menuModel;
+        ArrayList<MenuModel> menuFilter = new ArrayList<>();
+        ArrayList<String> image2key = new ArrayList<>();
+        for (int i =0; i<menus.size();i++){
+            int harga = Integer.parseInt(menus.get(i).getHarga());
+            if (harga<perbandingan){
+                menuFilter.add(menus.get(i));
+                image2key.add(imageKey.get(i));
+            }
+        }
+        menuAdapter = new MenuAdapter(this);
+        menuAdapter.addItem(menuFilter,image2key);
+        //recyclerView.clearOnScrollListeners();
+        recyclerView.setAdapter(menuAdapter);
+        Toast.makeText(getApplicationContext(),String.valueOf(menuFilter.size()),Toast.LENGTH_SHORT).show();
+        //menuFilter.clear();
     }
 
     private ArrayList<String> restoranKey = new ArrayList<>();

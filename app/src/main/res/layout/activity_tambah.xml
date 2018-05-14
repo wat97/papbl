@@ -38,14 +38,15 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Lokasi"
-        android:text="veteran"
-        android:inputType="number" />
+        android:text="GPS"
+        android:enabled="false" />
 
     <EditText
         android:id="@+id/et_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="date"
+        android:enabled="false"
         android:ems="10"
         android:inputType="date" />
 

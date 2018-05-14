@@ -43,9 +43,10 @@
         android:layout_height="wrap_content"
         android:hint="tanggal" />
 
-    <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerview"
-            android:layout_width="match_parent"
-            tools:listitem="@layout/row_menu"
-            android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btnMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Map" />
+
 </LinearLayout>

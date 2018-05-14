@@ -7,10 +7,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,13 +38,14 @@ import filkom.ub.getmeallocation.adapter.MenuAdapter;
 import filkom.ub.getmeallocation.model.MenuModel;
 import filkom.ub.getmeallocation.model.RestoranModel;
 
-public class DetailRestoranActivity extends AppCompatActivity {
+public class DetailRestoranActivity extends AppCompatActivity{
 
     private TextView tvNamaRestoran, tvNamaMenu, tvLokasi, tvHarga, tvTanggal;
 
     private RecyclerView recyclerView;
     private MenuAdapter menuAdapter;
     private ImageView imageView;
+    private Button btnMap;
 
     private DatabaseReference databaseReference;
     private MenuModel menu;
@@ -57,6 +66,7 @@ public class DetailRestoranActivity extends AppCompatActivity {
         tvHarga = (TextView) findViewById(R.id.tv_harga);
         tvTanggal = (TextView) findViewById(R.id.tv_tanggal);
         imageView = (ImageView) findViewById(R.id.iv_menu);
+        btnMap = (Button) findViewById(R.id.btnMap);
 
         tvNamaRestoran.setText(menu.getNamaMenu());
         tvLokasi.setText(menu.getHarga());
@@ -69,6 +79,19 @@ public class DetailRestoranActivity extends AppCompatActivity {
         //menuAdapter = new MenuAdapter(this);
 
         //getSpecificRestoran();
+        // Get the SupportMapFragment and request notification
+        // when the map is ready to be used.
+//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+//                .findFragmentById(R.id.map);
+//        mapFragment.getMapAsync(this);
+
+        btnMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(DetailRestoranActivity.this, MapActivity.class));
+            }
+        });
+
     }
 
     private void getSpecificRestoran() {
@@ -119,4 +142,6 @@ public class DetailRestoranActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }

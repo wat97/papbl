@@ -10,10 +10,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -32,8 +35,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,7 +49,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -62,6 +69,16 @@ import com.google.android.gms.location.LocationServices;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class TambahActivity extends AppCompatActivity implements GetAddressTask.OnTaskCompleted {
+
+    //Get lokasi
+    private static final int REQUEST_LOCATION = 1;
+    LocationManager lokasi;
+    //    private static final String TAG = "MainActivity";
+    String lattitude, longitude;
+    private FusedLocationProviderClient mfusedLocationProviderClient;
+    private static final String[] permisi = {
+            android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
+    };
 
     private EditText etNamamenu, etHarga, etDate, etLokasi;
     private AutoCompleteTextView actvNamaRestoran;
@@ -101,11 +118,51 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
 
     // Animation
     private AnimatorSet mRotateAnim;
+    private LocationManager mLocationManager;
+
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+//            Toast.makeText(TambahActivity.this, "lat" + String.valueOf(location.getLatitude()), Toast.LENGTH_SHORT).show();
+            lattitude = String.valueOf(location.getLatitude());
+            longitude = String.valueOf(location.getLongitude());
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tambah);
+
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1,
+                2000, mLocationListener);
 
         databaseRestoran = FirebaseDatabase.getInstance().getReference("restoran");
         databaseMenu = FirebaseDatabase.getInstance().getReference("menu");
@@ -118,6 +175,15 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
         imageView = (ImageView) findViewById(R.id.imageView);
         btnSubmitMenu = (Button) findViewById(R.id.button_submit_menu);
         btnSubmitImage = (Button) findViewById(R.id.btn_submit_iamge);
+
+        if(Build.VERSION.SDK_INT>=24){
+            try{
+                Method m = StrictMode.class.getMethod("disableDeathOnFileUriExposure");
+                m.invoke(null);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
 
         btnSubmitMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +222,7 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
 
         etDate.setText(setCurrentDate());
         getAllRestoran();
+//        getLocation();
     }
 
 
@@ -183,6 +250,15 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
                     try {
                         bitmap = android.provider.MediaStore.Images.Media
                                 .getBitmap(cr, selectedImage);
+
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 1, out);
+
+                        ByteArrayOutputStream out2 = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 1, out2);
+
+                        ByteArrayOutputStream out3 = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 1, out3);
 
                         imageView.setImageBitmap(bitmap);
 
@@ -361,7 +437,7 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
     private void uploadImage(String type, String key) {
 
         //storageReference = FirebaseStorage.getInstance().getReference(type + "/" + key + ".jpg");
-        storageReference = FirebaseStorage.getInstance().getReference(random());
+        storageReference = FirebaseStorage.getInstance().getReference("zzz");
 
         storageReference.putFile(imageUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -416,7 +492,7 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
             });
 
         } else {
-            RestoranModel restoranModel = new RestoranModel(actvNamaRestoran.getText().toString(), etLokasi.getText().toString());
+            RestoranModel restoranModel = new RestoranModel(actvNamaRestoran.getText().toString(), lattitude, longitude);
             String key = databaseRestoran.push().getKey();
             databaseRestoran.child(key).setValue(restoranModel);
             databaseRestoran.child(key).child("menu").child(key).setValue(menuModel);
@@ -447,5 +523,67 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 
+    }
+
+    protected void GetLokasi(){
+        lokasi = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!lokasi.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+
+        } else if (lokasi.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            getLocation();
+        }
+    }
+
+    protected void buildAlertMessageNoGps(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Please Turn ON your GPS Connection")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+    protected void getLocation(){
+        if (ActivityCompat.checkSelfPermission(TambahActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(TambahActivity.this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(TambahActivity.this, permisi, REQUEST_LOCATION);
+        } else {
+            mfusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+            try {
+
+                final Task location = mfusedLocationProviderClient.getLastLocation();
+                location.addOnCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(@NonNull Task task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "onComplete : found location");
+                            Location currentLocation = (Location) task.getResult();
+                            double latti = currentLocation.getLatitude();
+                            double longi = currentLocation.getLongitude();
+                            lattitude = String.valueOf(latti);
+                            longitude = String.valueOf(longi);
+
+                            etLokasi.setText("Lat = " + lattitude
+                                    + " --- " + "Long = " + longitude);
+                        } else {
+                            Log.d(TAG, "onComplete : current location is null");
+                            Toast.makeText(TambahActivity.this, "unable to get current location", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            } catch (SecurityException sqe) {
+                Log.e(TAG, "Security exception " + sqe.getMessage());
+            }
+        }
     }
 }
