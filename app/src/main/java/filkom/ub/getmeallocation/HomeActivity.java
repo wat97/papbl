@@ -140,7 +140,8 @@ public class HomeActivity extends AppCompatActivity {
                 String hargaa = menus.get(i).getHarga();
                 String date = menus.get(i).getDate();
                 String image = menus.get(i).getImageUrl();
-                MenuModel mm = new MenuModel(uid, nama, hargaa, date, image);
+                String namaResto = menus.get(i).getNamaRestoran();
+                MenuModel mm = new MenuModel(uid, nama, hargaa, date, image, namaResto);
                 carimenu.add(mm);
             }
         }
