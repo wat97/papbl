@@ -7,7 +7,7 @@
     android:orientation="horizontal"
     android:padding="5dp"
     android:layout_marginTop="9dp"
-    android:background="@color/putih">
+    android:background="#FFFFFF">
 
     <ImageView
         android:id="@+id/iv_menu"
