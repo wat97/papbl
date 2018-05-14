@@ -70,17 +70,8 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class TambahActivity extends AppCompatActivity  {
 
-    //Get lokasi
-    private static final int REQUEST_LOCATION = 1;
-    LocationManager lokasi;
-    //    private static final String TAG = "MainActivity";
     String lattitude, longitude;
-    private FusedLocationProviderClient mfusedLocationProviderClient;
-    private static final String[] permisi = {
-            android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
-    };
-
-    private EditText etNamamenu, etHarga, etDate, etLokasi;
+    private EditText etNamamenu, etHarga, etDate;
     private AutoCompleteTextView actvNamaRestoran;
     private Button btnSubmitMenu, btnSubmitImage;
     private ImageView imageView;
@@ -89,7 +80,6 @@ public class TambahActivity extends AppCompatActivity  {
     private String[] arrayNamaRestoran;
 
     private DatabaseReference databaseRestoran;
-    private DatabaseReference databaseMenu;
     private StorageReference storageReference;
 
     private ArrayAdapter<String> arrayAdapter;
@@ -101,15 +91,6 @@ public class TambahActivity extends AppCompatActivity  {
 
     private static final int TAKE_PICTURE = 1;
     private Uri imageUri;
-
-    // Constants
-    private static final int REQUEST_LOCATION_PERMISSION = 1;
-    private static final String TRACKING_LOCATION_KEY = "tracking_location";
-
-    // Location classes
-    private boolean mTrackingLocation;
-    private FusedLocationProviderClient mFusedLocationClient;
-    private LocationCallback mLocationCallback;
 
     // Animation
     private AnimatorSet mRotateAnim;
@@ -160,13 +141,11 @@ public class TambahActivity extends AppCompatActivity  {
                 2000, mLocationListener);
 
         databaseRestoran = FirebaseDatabase.getInstance().getReference("restoran");
-        databaseMenu = FirebaseDatabase.getInstance().getReference("menu");
 
         actvNamaRestoran = (AutoCompleteTextView) findViewById(R.id.actv_nama_restoran);
         etNamamenu = (EditText) findViewById(R.id.et_nama_makanan);
         etHarga = (EditText) findViewById(R.id.et_harga);
         etDate = (EditText) findViewById(R.id.et_date);
-        etLokasi = (EditText) findViewById(R.id.et_lokasi);
         imageView = (ImageView) findViewById(R.id.imageView);
         btnSubmitMenu = (Button) findViewById(R.id.button_submit_menu);
         btnSubmitImage = (Button) findViewById(R.id.btn_submit_iamge);
@@ -371,8 +350,8 @@ public class TambahActivity extends AppCompatActivity  {
 
     private void uploadImage(String type, String key) {
 
-        //storageReference = FirebaseStorage.getInstance().getReference(type + "/" + key + ".jpg");
-        storageReference = FirebaseStorage.getInstance().getReference(random());
+        String rand = random();
+        storageReference = FirebaseStorage.getInstance().getReference(rand);
 
         storageReference.putFile(imageUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {

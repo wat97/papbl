@@ -33,19 +33,11 @@
         android:inputType="number" />
 
     <EditText
-        android:id="@+id/et_lokasi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Lokasi"
-        android:text="veteran"
-        android:inputType="number" />
-
-    <EditText
         android:id="@+id/et_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="date"
+        android:visibility="gone"
         android:ems="10"
         android:inputType="date" />
 
