@@ -59,7 +59,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class TambahActivity extends AppCompatActivity  {
 
-    String lattitude, longitude;
+    static String lattitude, longitude;
     private EditText etNamamenu, etHarga, etDate;
     private AutoCompleteTextView actvNamaRestoran;
     private Button btnSubmitMenu, btnSubmitImage;
@@ -126,7 +126,7 @@ public class TambahActivity extends AppCompatActivity  {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1,
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000,
                 2000, mLocationListener);
 
         databaseRestoran = FirebaseDatabase.getInstance().getReference("restoran");
@@ -359,7 +359,7 @@ public class TambahActivity extends AppCompatActivity  {
             }
         }
 
-        final MenuModel menuModel = new MenuModel(firebaseAuth.getUid(), etNamamenu.getText().toString(), etHarga.getText().toString(), etDate.getText().toString(), imageUrl);
+        final MenuModel menuModel = new MenuModel(firebaseAuth.getUid(), etNamamenu.getText().toString(), etHarga.getText().toString(), etDate.getText().toString(), imageUrl, actvNamaRestoran.getText().toString() );
         if (restoranExist) {
             //query get dataaseRestoran REFERENCE
             //update REFERENCE menu1
