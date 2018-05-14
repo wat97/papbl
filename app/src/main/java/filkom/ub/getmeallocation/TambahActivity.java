@@ -68,7 +68,7 @@ import com.google.android.gms.location.LocationServices;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class TambahActivity extends AppCompatActivity implements GetAddressTask.OnTaskCompleted {
+public class TambahActivity extends AppCompatActivity  {
 
     //Get lokasi
     private static final int REQUEST_LOCATION = 1;
@@ -105,11 +105,6 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
     // Constants
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     private static final String TRACKING_LOCATION_KEY = "tracking_location";
-
-    // Views
-    private Button mLocationButton;
-    private TextView mLocationTextView;
-    private ImageView mAndroidImageView;
 
     // Location classes
     private boolean mTrackingLocation;
@@ -203,23 +198,6 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
 
         checkGpsEnabled(getApplicationContext());
 
-        // Initialize the location callbacks.
-        mLocationCallback = new LocationCallback() {
-            /**
-             * This is the callback that is triggered when the
-             * FusedLocationClient updates your location.
-             * @param locationResult The result containing the device location.
-             */
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                // If tracking is turned on, reverse geocode into an address
-                if (mTrackingLocation) {
-                    new GetAddressTask(TambahActivity.this, TambahActivity.this)
-                            .execute(locationResult.getLastLocation());
-                }
-            }
-        };
-
         etDate.setText(setCurrentDate());
         getAllRestoran();
 //        getLocation();
@@ -273,49 +251,6 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
                     }
                 }
         }
-    }
-
-    /**
-     * Starts tracking the device. Checks for
-     * permissions, and requests them if they aren't present. If they are,
-     * requests periodic location updates, sets a loading text and starts the
-     * animation.
-     */
-    private void startTrackingLocation() {
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]
-                            {Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_LOCATION_PERMISSION);
-        } else {
-            mTrackingLocation = true;
-            mFusedLocationClient.requestLocationUpdates
-                    (getLocationRequest(),
-                            mLocationCallback,
-                            null /* Looper */);
-
-            // Set a loading text while you wait for the address to be
-            // returned
-            mLocationTextView.setText(getString(R.string.address_text,
-                    getString(R.string.loading),
-                    System.currentTimeMillis()));
-            mLocationButton.setText(R.string.stop_tracking_location);
-            mRotateAnim.start();
-        }
-    }
-
-    /**
-     * Sets up the location request.
-     *
-     * @return The LocationRequest object containing the desired parameters.
-     */
-    private LocationRequest getLocationRequest() {
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        return locationRequest;
     }
 
     public  boolean isStoragePermissionGranted() {
@@ -437,7 +372,7 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
     private void uploadImage(String type, String key) {
 
         //storageReference = FirebaseStorage.getInstance().getReference(type + "/" + key + ".jpg");
-        storageReference = FirebaseStorage.getInstance().getReference("zzz");
+        storageReference = FirebaseStorage.getInstance().getReference(random());
 
         storageReference.putFile(imageUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -508,83 +443,6 @@ public class TambahActivity extends AppCompatActivity implements GetAddressTask.
 
     private void goToMain() {
         startActivity(new Intent(this, HomeActivity.class));
-    }
-
-    @Override
-    public void onTaskCompleted(String result) {
-        if (mTrackingLocation) {
-            // Update the UI
-            Log.d(TAG, "onTaskCompleted: "+result);
-            mLocationTextView.setText(getString(R.string.address_text,
-                    result, System.currentTimeMillis()));
-        }
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
-
-    protected void GetLokasi(){
-        lokasi = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!lokasi.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            buildAlertMessageNoGps();
-
-        } else if (lokasi.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            getLocation();
-        }
-    }
-
-    protected void buildAlertMessageNoGps(){
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Please Turn ON your GPS Connection")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
-    protected void getLocation(){
-        if (ActivityCompat.checkSelfPermission(TambahActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(TambahActivity.this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(TambahActivity.this, permisi, REQUEST_LOCATION);
-        } else {
-            mfusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-            try {
-
-                final Task location = mfusedLocationProviderClient.getLastLocation();
-                location.addOnCompleteListener(new OnCompleteListener() {
-                    @Override
-                    public void onComplete(@NonNull Task task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "onComplete : found location");
-                            Location currentLocation = (Location) task.getResult();
-                            double latti = currentLocation.getLatitude();
-                            double longi = currentLocation.getLongitude();
-                            lattitude = String.valueOf(latti);
-                            longitude = String.valueOf(longi);
-
-                            etLokasi.setText("Lat = " + lattitude
-                                    + " --- " + "Long = " + longitude);
-                        } else {
-                            Log.d(TAG, "onComplete : current location is null");
-                            Toast.makeText(TambahActivity.this, "unable to get current location", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            } catch (SecurityException sqe) {
-                Log.e(TAG, "Security exception " + sqe.getMessage());
-            }
-        }
     }
 }
 
