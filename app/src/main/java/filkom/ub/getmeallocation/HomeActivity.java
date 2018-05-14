@@ -135,11 +135,12 @@ public class HomeActivity extends AppCompatActivity {
         carimenu.clear();
         for(int i=0; i<menus.size(); i++){
             if(menus.get(i).getHarga().equals(harga) ) {
+                String uid = menus.get(i).getUidUser();
                 String nama = menus.get(i).getNamaMenu();
                 String hargaa = menus.get(i).getHarga();
                 String date = menus.get(i).getDate();
                 String image = menus.get(i).getImageUrl();
-                MenuModel mm = new MenuModel(nama, hargaa, date, image);
+                MenuModel mm = new MenuModel(uid, nama, hargaa, date, image);
                 carimenu.add(mm);
             }
         }
