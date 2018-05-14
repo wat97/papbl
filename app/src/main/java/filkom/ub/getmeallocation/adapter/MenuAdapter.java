@@ -67,7 +67,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
         holder.btnDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, menus.get(position).getImageUrl(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, menus.get(position).getImageUrl(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(context, DetailRestoranActivity.class);
                 Bundle args = new Bundle();
                 args.putSerializable("MENU", (Serializable) menus.get(position));
