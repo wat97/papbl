@@ -7,6 +7,12 @@
     android:orientation="vertical"
     tools:context=".TambahActivity">
 
+        <Button
+        android:id="@+id/btn_submit_iamge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tambahkan gambar" />
+
 
     <AutoCompleteTextView
         android:id="@+id/actv_nama_restoran"
@@ -20,7 +26,6 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="nama makanan"
         android:hint="Nama makanan" />
 
     <EditText
@@ -28,7 +33,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:text="90000"
         android:hint="Harga makanan"
         android:inputType="number" />
 
@@ -46,11 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="80dp" />
 
-    <Button
-        android:id="@+id/btn_submit_iamge"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Tambahkan gambar" />
+
 
     <Button
         android:id="@+id/button_submit_menu"
