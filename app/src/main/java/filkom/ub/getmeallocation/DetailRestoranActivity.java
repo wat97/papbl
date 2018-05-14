@@ -109,7 +109,7 @@ public class DetailRestoranActivity extends AppCompatActivity {
                     imageKey.add(snapshot.getKey());
                     i++;
                 }
-                menuAdapter.addItem(menuModels, imageKey);
+                menuAdapter.addItem(menuModels);
                 recyclerView.setAdapter(menuAdapter);
             }
 

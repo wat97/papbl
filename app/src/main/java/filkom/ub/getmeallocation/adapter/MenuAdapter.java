@@ -41,7 +41,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
         this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void addItem(ArrayList<MenuModel> menus, ArrayList<String> imageKey) {
+    public void addItem(ArrayList<MenuModel> menus) {
         this.menus = menus;
         this.imageKey = imageKey;
         notifyDataSetChanged();

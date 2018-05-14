@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -36,15 +39,22 @@ public class HomeActivity extends AppCompatActivity {
 
     //view objects
     private TextView textViewUserEmail;
-    private Button buttonLogout, buttonTambah;
+    private EditText et_cari;
+    private Button buttonLogout, buttonTambah, buttonCari;
 
     private DatabaseReference databaseRestoran;
-    private DatabaseReference databaseMenu;
+    private Query cariHarga;
 
     private RecyclerView recyclerView;
     private RestoranAdapter restoranAdapter;
     private MenuAdapter menuAdapter;
-    private ArrayList<RestoranModel> restoranModels;
+
+    private ArrayList<String> imageKey = new ArrayList<>();
+    private ArrayList<MenuModel> menus = new ArrayList<>();
+    private ArrayList<MenuModel> carimenu = new ArrayList<>();
+
+    ArrayList<String> restoranKey = new ArrayList<>();
+    ArrayList<RestoranModel> restorans = new ArrayList<>();
 
     public static final String TAG = "getMeal";
 
@@ -69,9 +79,11 @@ public class HomeActivity extends AppCompatActivity {
         databaseRestoran = FirebaseDatabase.getInstance().getReference("restoran");
 
         //initializing views
+        et_cari = (EditText) findViewById(R.id.EditCari);
         textViewUserEmail = (TextView) findViewById(R.id.textViewUserEmail);
         buttonLogout = (Button) findViewById(R.id.buttonLogout);
         buttonTambah = (Button) findViewById(R.id.buttonTambah);
+        buttonCari = (Button) findViewById(R.id.buttonCari);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -102,17 +114,46 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        buttonCari.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(et_cari.getText().toString().equals("")){
+                    getAllRestoran();
+                }else{
+                    Cari(et_cari.getText().toString());
+                }
+            }
+        });
+
+
+        //Tampil Menu
         getAllRestoran();
+
     }
 
-    private ArrayList<String> restoranKey = new ArrayList<>();
+    private void Cari(String harga){
+        carimenu.clear();
+        for(int i=0; i<menus.size(); i++){
+            if(menus.get(i).getHarga().equals(harga) ) {
+                String nama = menus.get(i).getNamaMenu();
+                String hargaa = menus.get(i).getHarga();
+                String date = menus.get(i).getDate();
+                String image = menus.get(i).getImageUrl();
+                MenuModel mm = new MenuModel(nama, hargaa, date, image);
+                carimenu.add(mm);
+            }
+        }
+        menuAdapter.addItem(carimenu);
+        recyclerView.setAdapter(menuAdapter);
+    }
+
+
+
     private void getAllRestoran() {
         databaseRestoran.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-                ArrayList<RestoranModel> restorans = new ArrayList<>();
-
+                restoranKey.clear();
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     RestoranModel restoranModel = dataSnapshot1.getValue(RestoranModel.class);
                     restorans.add(restoranModel);
@@ -133,9 +174,10 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private ArrayList<MenuModel> menus = new ArrayList<>();
-    private ArrayList<String> imageKey = new ArrayList<>();
+
     private void getAllMenu() {
+        menus.clear();
+        imageKey.clear();
         for (int i = 0; i < restoranKey.size(); i++) {
             databaseRestoran.child(restoranKey.get(i)).child("menu").addValueEventListener(new ValueEventListener() {
                 @Override
@@ -146,7 +188,7 @@ public class HomeActivity extends AppCompatActivity {
                         Log.d(TAG, "onDataChange: "+snapshot.getKey());
                         imageKey.add(snapshot.getKey());
                     }
-                    menuAdapter.addItem(menus, imageKey);
+                    menuAdapter.addItem(menus);
                     recyclerView.setAdapter(menuAdapter);
                     Log.d(TAG, "onDataChange: "+imageKey.get(0));
                 }
