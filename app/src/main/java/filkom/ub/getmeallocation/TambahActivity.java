@@ -39,6 +39,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -88,12 +89,12 @@ public class TambahActivity extends AppCompatActivity  {
     public static String imageUrl = "null";
     public static String imagePath = "null";
 
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     private static final int TAKE_PICTURE = 1;
     private Uri imageUri;
 
     // Animation
-    private AnimatorSet mRotateAnim;
     private LocationManager mLocationManager;
 
     private final LocationListener mLocationListener = new LocationListener() {
@@ -149,6 +150,8 @@ public class TambahActivity extends AppCompatActivity  {
         imageView = (ImageView) findViewById(R.id.imageView);
         btnSubmitMenu = (Button) findViewById(R.id.button_submit_menu);
         btnSubmitImage = (Button) findViewById(R.id.btn_submit_iamge);
+
+
 
         if(Build.VERSION.SDK_INT>=24){
             try{
@@ -336,22 +339,9 @@ public class TambahActivity extends AppCompatActivity  {
         uploadImage("menu", imagePath);
     }
 
-    public static String random() {
-        Random generator = new Random();
-        StringBuilder randomStringBuilder = new StringBuilder();
-        int randomLength = generator.nextInt(3);
-        char tempChar;
-        for (int i = 0; i < randomLength; i++){
-            tempChar = (char) (generator.nextInt(96) + 32);
-            randomStringBuilder.append(tempChar);
-        }
-        return randomStringBuilder.toString();
-    }
-
     private void uploadImage(String type, String key) {
 
-        String rand = random();
-        storageReference = FirebaseStorage.getInstance().getReference(rand);
+        storageReference = FirebaseStorage.getInstance().getReference(String.valueOf(new Random().nextInt(999999)));
 
         storageReference.putFile(imageUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -381,7 +371,7 @@ public class TambahActivity extends AppCompatActivity  {
             }
         }
 
-        final MenuModel menuModel = new MenuModel(etNamamenu.getText().toString(), etHarga.getText().toString(), etDate.getText().toString(), imageUrl);
+        final MenuModel menuModel = new MenuModel(firebaseAuth.getUid(), etNamamenu.getText().toString(), etHarga.getText().toString(), etDate.getText().toString(), imageUrl);
         if (restoranExist) {
             //query get dataaseRestoran REFERENCE
             //update REFERENCE menu1
