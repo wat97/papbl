@@ -3,8 +3,10 @@ package filkom.ub.getmeallocation;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -89,7 +91,8 @@ public class DetailRestoranActivity extends AppCompatActivity implements OnMapRe
         tvTanggal = (TextView) findViewById(R.id.tv_tanggal);
         imageView = (ImageView) findViewById(R.id.iv_menu);
 
-        tvNamaRestoran.setText(menu.getNamaMenu());
+        tvNamaRestoran.setText(menu.getNamaRestoran());
+        tvNamaMenu.setText(menu.getNamaMenu());
         tvLokasi.setText(menu.getHarga());
         Picasso.get().load(menu.getImageUrl()).into(imageView);
 
@@ -107,7 +110,7 @@ public class DetailRestoranActivity extends AppCompatActivity implements OnMapRe
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     RestoranModel restoranModel = dataSnapshot1.getValue(RestoranModel.class);
                     //Toast.makeText(getApplicationContext(), restoranModel.getLat(), Toast.LENGTH_SHORT).show();
-                        //Log.d("hoammm resto", "onDataChange: "+restoranModel.getNamaRestoran());
+                    //Log.d("hoammm resto", "onDataChange: "+restoranModel.getNamaRestoran());
                     //Log.d("hoammm menu", "onDataChange: "+menu.getNamaMenu());
                     if (restoranModel.getNamaRestoran().equals(menu.getNamaRestoran())) {
                         restoranKey = dataSnapshot1.getKey();
@@ -133,6 +136,7 @@ public class DetailRestoranActivity extends AppCompatActivity implements OnMapRe
     private void getMenus(String restoranKey) {
         databaseReference.child(restoranKey).child("menu").addValueEventListener(new ValueEventListener() {
             int i = 0;
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 menuModels = new ArrayList<>();
@@ -154,6 +158,7 @@ public class DetailRestoranActivity extends AppCompatActivity implements OnMapRe
         });
     }
 
+
     private void setupRestaurantMarker() {
         if (mRestaurantMarker == null) mRestaurantMarker = new MarkerOptions();
         mDatabaseReference.child("restoran").addValueEventListener(new ValueEventListener() {
@@ -162,11 +167,13 @@ public class DetailRestoranActivity extends AppCompatActivity implements OnMapRe
                 for (DataSnapshot restaurantsSnapShot : dataSnapshot.getChildren()) {
                     RestoranModel restaurant = restaurantsSnapShot.getValue(RestoranModel.class);
                     if (restaurant != null) {
+                        if (restaurant.getNamaRestoran().equals(menu.getNamaRestoran())){
                         double restaurantLat = Double.parseDouble(restaurant.getLat());
                         double restaurantLong = Double.parseDouble(restaurant.getLng());
                         addLocationMarker(mGoogleMap, new LatLng(restaurantLat, restaurantLong), restaurant.getNamaRestoran());
                         mRestaurants.add(restaurant);
                         //printLog("HomeFragment", "setupRestaurantMarker: " + restaurant.getLat() + "," + restaurant.getLong());
+                            }
                     }
                 }
             }
@@ -176,6 +183,7 @@ public class DetailRestoranActivity extends AppCompatActivity implements OnMapRe
                 //printLog("HomeFragment", "onCancelled: " + databaseError.getMessage());
             }
         });
+
     }
 
     private void addLocationMarker(GoogleMap mapObject, LatLng location, String title) {
@@ -230,6 +238,17 @@ public class DetailRestoranActivity extends AppCompatActivity implements OnMapRe
 //            }
 //        });
 
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mGoogleMap.setMyLocationEnabled(true);
     }
 
     public void onLocationReady() {
@@ -237,7 +256,7 @@ public class DetailRestoranActivity extends AppCompatActivity implements OnMapRe
 
         addLocationMarker(mGoogleMap, loc, "Current Location");
         mLocationMarker.position(loc);
-        //addCameraToMap(mGoogleMap, loc);
+        addCameraToMap(mGoogleMap, loc);
         setupRestaurantMarker();
     }
 
